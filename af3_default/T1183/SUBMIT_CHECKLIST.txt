@@ -1,0 +1,10 @@
+AF3 submission checklist -- T1183 (default MSA condition)
+1. Go to https://alphafoldserver.com and start a new job.
+2. Paste the raw sequence from input_sequence.fasta -- do NOT upload a custom MSA,
+   let AF3 build its own alignment.
+3. Leave every other setting identical to the custom-MSA run for T1183.
+4. Submit. Record the job ID + timestamp with:
+     python scripts/log_af3_job.py --log --target T1183 --condition default \
+         --job-id <ID> --submitted-at <ISO8601> --model-version <version>
+5. Once complete, download the top-ranked model (.cif/.pdb) and confidence
+   JSON into this folder.

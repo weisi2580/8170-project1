@@ -1,0 +1,18 @@
+# internal planning docs -- not part of the public repo
+AI-LOG.md
+claude.md
+project_plan.md
+
+# Python / environment
+.venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# build artifacts (rebuild with scripts/build_usalign.sh)
+bin/USalign
+
+# large / regenerable intermediate MSA search results
+msa/*/raw/
