@@ -1,4 +1,4 @@
-casp_id,length,pdb_id,chain,download_date,casp_difficulty_class
-T1183,200,8IFX,B,2026-09-21,TBD
-T1112,460,8ORK,(single chain),2026-09-21,TBD
-T1122,241,8BBT,A,2026-09-21,TBD
+casp_id,length,pdb_id,chain,download_date,casp_difficulty_class,eval_unit
+T1183,200,8IFX,B,2026-09-21,TBM-easy,1-195
+T1112,460,8ORK,(single chain),2026-09-21,FM/TBM,1-460
+T1122,241,8BBT,A,2026-09-21,FM,4-237

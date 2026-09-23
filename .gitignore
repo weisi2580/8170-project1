@@ -14,3 +14,9 @@ bin/USalign
 
 # large / regenerable intermediate MSA search results
 msa/*/raw/
+
+# unpacked AF3 server downloads (regenerate from af3_raw/*.zip with
+# scripts/import_af3_results.py); the top-ranked model + confidence JSONs
+# are copied up one level and committed
+af3_custom/*/server_output/
+af3_default/*/server_output/

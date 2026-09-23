@@ -1,0 +1,25 @@
+{
+  "casp_id": "T1122",
+  "condition": "custom",
+  "job_id": "T1122_custom_MSA",
+  "submitted_at": null,
+  "finished_at": "2026-09-23T16:05Z",
+  "model_version": "AlphaFold Server (AF3), dialect alphafoldserver v3",
+  "msa_input": "msa/T1122/T1122_custom.a3m",
+  "model_seeds": [
+    "517604978"
+  ],
+  "use_structure_template": true,
+  "template_pdb_ids": [
+    "2pyb",
+    "3f9i",
+    "4ayd"
+  ],
+  "n_samples": 5,
+  "top_ranked_sample": 0,
+  "top_ranking_score": 0.58,
+  "server_msas": [
+    "server_output/msas/fold_t1122_custom_msa_unpaired_t1122_custom_a3m_msa_chains_a.a3m"
+  ],
+  "notes": "imported from af3_raw/fold_t1122_custom_msa.zip"
+}

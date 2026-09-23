@@ -1,4 +1,4 @@
-casp_id,pdb_id,length,casp_difficulty_class,msa_depth,msa_neff_per_l,tm_score_custom,tm_score_default,rmsd_custom,rmsd_default,plddt_custom,plddt_default
-T1112,8ORK,460,TBD,855,1.2061,,,,,,
-T1122,8BBT,241,TBD,2,0.0041,,,,,,
-T1183,8IFX,200,TBD,581,2.6317,,,,,,
+casp_id,pdb_id,length,casp_difficulty_class,eval_unit,msa_depth_custom,msa_depth_default,neff_per_l_custom,neff_per_l_default,tm_score_custom,tm_score_default,lddt_custom,lddt_default,rmsd_custom,rmsd_default,mean_plddt_custom,mean_plddt_default,tm_score_mean5_custom,tm_score_mean5_default,delta_tm_custom_minus_default,delta_lddt_custom_minus_default
+T1183,8IFX,200,TBM-easy,1-195,581,8032,2.6317,13.776,0.983,0.9861,0.9538,0.9562,0.7,0.63,93.7442,92.5758,0.9831,0.9845,-0.0031,-0.0024
+T1112,8ORK,460,FM/TBM,1-460,855,1967,1.2061,0.8953,0.9006,0.9383,0.8866,0.8922,3.0,2.28,96.4057,94.871,0.9017,0.9247,-0.0377,-0.0056
+T1122,8BBT,241,FM,4-237,2,3,0.0041,0.0083,0.4255,0.5126,0.4726,0.5233,18.47,14.17,46.2046,49.0025,0.427,0.5034,-0.0871,-0.0507

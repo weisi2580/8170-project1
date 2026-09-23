@@ -1,0 +1,10 @@
+casp_id,msa_source,depth,neff,neff_per_l,mean_coverage,mean_identity,min_column_coverage,af3_paired_depth,path
+T1183,custom,581,526.34,2.6317,0.6001,0.2967,0,,msa/T1183/T1183_custom.a3m
+T1183,af3_default_unpaired,5034,2745.28,13.7264,0.5387,0.3427,1,2999,af3_default/T1183/server_output/msas/fold_t1183_default_msa_unpaired_msa_chains_a.a3m
+T1183,af3_default_all,8032,2755.2,13.776,0.536,0.3443,2,2999,unpaired + paired server MSAs
+T1112,custom,855,554.82,1.2061,0.8157,0.426,40,,msa/T1112/T1112_custom.a3m
+T1112,af3_default_unpaired,1461,406.06,0.8827,0.5285,0.4661,3,507,af3_default/T1112/server_output/msas/fold_t1112_default_msa_unpaired_msa_chains_a.a3m
+T1112,af3_default_all,1967,411.85,0.8953,0.5981,0.4695,6,507,unpaired + paired server MSAs
+T1122,custom,2,1.0,0.0041,1.0,1.0,1,,msa/T1122/T1122_custom.a3m
+T1122,af3_default_unpaired,2,2.0,0.0083,0.1535,0.3514,0,2,af3_default/T1122/server_output/msas/fold_t1122_default_msa_unpaired_msa_chains_a.a3m
+T1122,af3_default_all,3,2.0,0.0083,0.5768,0.6757,1,2,unpaired + paired server MSAs

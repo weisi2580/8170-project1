@@ -26,14 +26,14 @@ RCSB_DIR = ROOT / "data" / "RCSB"
 CHAIN_DIR = ROOT / "data" / "RCSB_chain"
 METADATA_CSV = ROOT / "data" / "metadata.csv"
 
-# (CASP target ID, PDB ID, chain to keep, CASP15 difficulty class)
-# Difficulty class left as "TBD" here -- fill in from the official CASP15
-# classification at https://predictioncenter.org/casp15/domains_summary.cgi
-# before using it in the report; do not guess it silently.
+# (CASP target ID, PDB ID, chain to keep, CASP15 difficulty class, evaluation unit)
+# Difficulty class and evaluation-unit residue range are copied from the
+# official CASP15 domain table (checked 2026-09-23):
+# https://predictioncenter.org/casp15/domains_summary.cgi
 TARGETS = [
-    {"casp_id": "T1183", "pdb_id": "8IFX", "chain": "B", "difficulty": "TBD"},
-    {"casp_id": "T1112", "pdb_id": "8ORK", "chain": None, "difficulty": "TBD"},  # single-chain
-    {"casp_id": "T1122", "pdb_id": "8BBT", "chain": "A", "difficulty": "TBD"},
+    {"casp_id": "T1183", "pdb_id": "8IFX", "chain": "B", "difficulty": "TBM-easy", "eval_unit": "1-195"},
+    {"casp_id": "T1112", "pdb_id": "8ORK", "chain": None, "difficulty": "FM/TBM", "eval_unit": "1-460"},  # single-chain
+    {"casp_id": "T1122", "pdb_id": "8BBT", "chain": "A", "difficulty": "FM", "eval_unit": "4-237"},
 ]
 
 RCSB_CIF_URL = "https://files.rcsb.org/download/{pdb_id}.cif"
@@ -83,7 +83,7 @@ def build_metadata(rows):
     with open(METADATA_CSV, "w", newline="") as fh:
         writer = csv.DictWriter(
             fh,
-            fieldnames=["casp_id", "length", "pdb_id", "chain", "download_date", "casp_difficulty_class"],
+            fieldnames=["casp_id", "length", "pdb_id", "chain", "download_date", "casp_difficulty_class", "eval_unit"],
         )
         writer.writeheader()
         writer.writerows(rows)
@@ -126,6 +126,7 @@ def main():
                 "chain": chain or "(single chain)",
                 "download_date": today,
                 "casp_difficulty_class": difficulty,
+                "eval_unit": target["eval_unit"],
             }
         )
 

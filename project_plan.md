@@ -29,7 +29,7 @@ project1/
 
 **Follow-up status**:
 - ✅ Chain extraction done: `data/RCSB_chain/8IFX_B.cif` and `data/RCSB_chain/8BBT_A.cif` (8ORK is single-chain, used as-is).
-- ✅ `data/metadata.csv` built. Note: `casp_difficulty_class` column is `TBD` — fill in from the official CASP15 classification before using it in the report.
+- ✅ `data/metadata.csv` built. `casp_difficulty_class` + `eval_unit` filled in on 2026-09-23 from the official CASP15 domain table (https://predictioncenter.org/casp15/domains_summary.cgi): T1183 TBM-easy (1-195), T1112 FM/TBM (1-460), T1122 FM (4-237).
 - ✅ `scripts/fetch_targets.py` written (chain extraction + metadata build; `--download` re-fetches CIFs from RCSB).
 
 **Outputs**: `data/CASP15/*.fasta` ✅, `data/RCSB/*.cif` ✅, `data/RCSB_chain/*.cif` ✅, `data/metadata.csv` ✅.
@@ -113,7 +113,7 @@ project1/
 
 ---
 
-## Step 5 — AlphaFold3 predictions (two conditions)
+## Step 5 — AlphaFold3 predictions (two conditions) ✅ DONE
 
 **Goal**: Run each target twice — once with the custom A3M, once with AF3's default alignment — keeping every other setting identical.
 
@@ -127,11 +127,11 @@ project1/
 
 **Manual step?**: **Yes** — the public AlphaFold3 server is a browser-based tool with no general public batch API for this use case. Claude Code can prepare the exact input files and a checklist, but a human must perform the actual upload/submission/download for each of the 6 jobs, then hand the downloaded files back to Claude Code for the next steps.
 
-**Status**: **Inputs prepared, submissions pending.** `scripts/log_af3_job.py --prep` wrote `input_sequence.fasta` + `SUBMIT_CHECKLIST.txt` into all 6 of `af3_custom/<ID>/` and `af3_default/<ID>/`. Still needed: the human submits all 6 jobs at alphafoldserver.com, logs each with `--log`, and drops the downloaded model + confidence JSON into the matching folder.
+**Status**: **Completed 2026-09-23.** The human ran all 6 jobs on alphafoldserver.com (templates on, 5 samples each, server-chosen seed per job) and saved the 6 download zips, now in `af3_raw/`. `scripts/import_af3_results.py` (new) unpacks them into `af3_<cond>/<ID>/server_output/`. It verifies each job sequence == FASTA and each uploaded custom MSA == `msa/<ID>/<ID>_custom.a3m` byte-for-byte, copies the top-ranked sample to `<ID>_model.cif` / `<ID>_confidence.json`, and writes `job_metadata.json` (seed, templates, ranking score). Checked that no template is a reference structure (all templates deposited ≤ 2015, none of 8IFX/8ORK/8BBT). Caveats for the report: the two conditions got different seeds, and different template sets for T1112/T1122.
 
 ---
 
-## Step 6 — Structure evaluation
+## Step 6 — Structure evaluation ✅ DONE
 
 **Goal**: Score both conditions against the experimental PDB reference.
 
@@ -145,11 +145,11 @@ project1/
 
 **Manual step?**: No, once model files are downloaded.
 
-**Status**: **Script written and dry-run tested** (`scripts/evaluate_structures.py`, using vendored/compiled US-align instead of a separate TMalign+lddt toolchain — see Step 2). Currently produces no rows since no AF3 models exist yet; will populate `eval/scores_summary.csv` automatically once Step 5 lands models in `af3_custom/*/` and `af3_default/*/`.
+**Status**: **Completed.** `scripts/evaluate_structures.py` was rewritten to score all 5 samples per run (30 models) on the CASP evaluation unit: US-align `-TMscore 1` TM-score/RMSD, numpy Cα-lDDT, pLDDT, PAE and pTM. Outputs are `eval/scores_summary.csv` (6 rows), `eval/scores_all_samples.csv` (30 rows) and `eval/<ID>/per_residue_<cond>.csv`. Bug found and fixed along the way: US-align silently dropped 8ORK's 12 MSE (HETATM) residues, so it is now fed clean Cα files with an assertion on the residue count. PyMOL's independent fit reproduces every RMSD exactly. Added `scripts/compare_msas.py` (custom MSA vs. the MSA the AF3 server built) → `eval/msa_comparison.csv`.
 
 ---
 
-## Step 7 — Visualization & final comparison
+## Step 7 — Visualization & final comparison ✅ DONE
 
 **Goal**: Produce all figures and tables needed for the report/slides.
 
@@ -164,7 +164,7 @@ project1/
 
 **Manual step?**: No (overlay.pml needs PyMOL installed, which isn't set up on this machine yet — see env.yml).
 
-**Status**: **Scripts written and dry-run tested** (`scripts/plot_comparison.py`, `scripts/overlay.pml`, `scripts/write_results.py`). `eval/target_summary_table.csv` and a placeholder `RESULTS.md` already generate correctly from the Step 1–4 data with AF3 columns blank; they'll fill in once Step 5/6 provide real scores.
+**Status**: **Completed.** `scripts/plot_comparison.py` writes `figures/metric_comparison.png`, `msa_depth_vs_accuracy.png`, `plddt_vs_lddt.png`, and per target `per_residue.png` (MSA coverage + pLDDT + Cα error; replaces the planned `plddt.png`) and `pae.png`. `scripts/render_overlays.py` (PyMOL pip wheel; replaces `overlay.pml`) writes `figures/<ID>/overlay.png` + `overlay_plddt.png`. `scripts/write_results.py` generates `RESULTS.md` with every number read from `eval/`. `make analysis` rebuilds all of it byte-identically from `af3_raw/`. **Result:** the custom MSA never beat AF3's default (ΔTM −0.003 / −0.038 / −0.087 for T1183 / T1112 / T1122), so the working hypothesis is not supported. See `RESULTS.md`.
 
 ---
 
@@ -179,5 +179,4 @@ project1/
 ## Suggested run order
 
 1 ✅, 2 ✅, 3 ✅, 4 ✅ — all completed in one Claude Code session, with real data (see per-step Status notes above).
-5 requires a manual pause for the 6 AF3 web submissions — **currently blocking** (inputs/checklists are ready in `af3_custom/*/` and `af3_default/*/`).
-6→7→8 are scripted and dry-run tested against empty AF3 output; they'll resume automatically and produce real numbers once the model files are back on disk.
+5 ✅ (manual AF3 submissions, 2026-09-23), 6 ✅, 7 ✅, 8 ✅ — all done. Remaining optional follow-ups for the report: a templates-off rerun of both conditions (isolates the MSA effect), and a "custom ∪ default MSA" condition.
