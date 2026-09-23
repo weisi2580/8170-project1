@@ -1,10 +1,5 @@
 # AI-LOG
 
-**Course:** CS 8630 | **Student:** _name_ | **Project/Assignment:** _which_
-
-> Commit an entry in the same commit as the work it describes. Entries are graded on
-> judgment quality, not volume. Summaries, not transcripts. One entry per meaningful
-> AI interaction or work session — not per prompt.
 
 ---
 
