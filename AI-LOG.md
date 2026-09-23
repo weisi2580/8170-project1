@@ -22,18 +22,6 @@
 
 ---
 
-## Example entry (delete before first commit)
-
-### [2026-10-14] — First pass at contributor-activity view
-- **Tool/model:** Claude Sonnet 4.6
-- **What I asked for:** a multi-series time chart of monthly commit counts for the top 8 contributors, from my cleaned dataframe
-- **What it produced:** working Plotly code using a stacked area chart with a qualitative palette
-- **Accepted:** the data-wrangling (groupby/resample) after checking totals against a manual count for two months
-- **Rejected/modified:** the stacked area encoding. My task is comparing individual contributors' trends; stacking puts all but the bottom series on a shifting baseline, which destroys position-along-common-scale judgment (Cleveland). Switched to small multiples with shared y-axis.
-- **Verification:** re-ran against raw data; spot-checked contributor #3's spike against the actual commit log for that month.
-
----
-
 ### [2026-09-21] — Repo setup + Steps 1–4 (chain extraction, MSA build/filter/QC) for all 3 targets
 - **Tool/model:** Claude Sonnet 5 (Claude Code CLI)
 - **What I asked for:** execute project_plan.md end to end — build the repo structure, README, and run the pipeline as far as it can go without the manual AF3 web step.
