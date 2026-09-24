@@ -28,6 +28,8 @@ For each target, AF3 is run twice — once seeded with a custom MSA built via th
 - On the orphan target T1122, *neither* pipeline found a single real homolog (both MSAs are effectively single-sequence), so a custom MSA had nothing to add.
 - AF3's confidence (pLDDT/pTM) was *higher* for the less accurate custom-MSA model on T1183 and T1112. Confidence alone cannot pick the better MSA strategy.
 
+**Interactive results page:** [`docs/index.html`](docs/index.html). Download it and open it in any browser (an internet connection is needed to load the 3D library). It shows each target's experimental structure with both AF3 models overlaid in 3D (drag to rotate, scroll to zoom), with colouring by condition or by pLDDT, and per-residue confidence/error tracks linked to the 3D view.
+
 ## Repository structure
 
 ```
@@ -53,6 +55,7 @@ project1/
 ├── figures/                 metric_comparison, msa_depth_vs_accuracy, plddt_vs_lddt
 │   └── <ID>/                msa_qc_*.png, per_residue.png, pae.png, overlay.png, overlay_plddt.png
 ├── RESULTS.md               generated write-up (scripts/write_results.py)
+├── docs/index.html          interactive 3D results page (scripts/build_web_page.py from web/template.html)
 ├── scripts/                  every pipeline stage (see below), plus vendor/ (US-align source)
 ├── bin/USalign               compiled structure-alignment binary (gitignored, build with scripts/build_usalign.sh)
 ├── env.yml                   conda environment spec
@@ -100,13 +103,14 @@ The pipeline mirrors `project_plan.md`'s steps 1–8. Everything except the AF3 
 | 7. Comparison figures + table | `python scripts/plot_comparison.py` | `figures/metric_comparison.png`, `msa_depth_vs_accuracy.png`, `plddt_vs_lddt.png`, per-target `per_residue.png` + `pae.png`, `eval/target_summary_table.csv` |
 | 7b. 3D overlay figures | `python scripts/render_overlays.py` | PyMOL (pip wheel `pymol-open-source-whl`, in requirements.txt): reference/custom/default overlay + pLDDT-coloured models |
 | 7c. Results write-up | `python scripts/write_results.py` | Generates `RESULTS.md`; every number is read from `eval/` |
+| 7d. Interactive page | `python scripts/build_web_page.py` | Writes `docs/index.html`: 3D overlay (3Dmol.js, loaded from cdnjs) + per-residue tracks; open it in a browser |
 
 Or via `make`:
 ```bash
 make setup usalign
 make all           # stages 1, 3, 3b, 4, and AF3 input prep
 # ... manual AF3 step (see below) ...
-make analysis      # import, evaluate, msa-compare, compare, overlays, results
+make analysis      # import, evaluate, msa-compare, compare, overlays, results, web
 ```
 
 ### Step 5 is manual

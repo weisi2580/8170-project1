@@ -1,7 +1,7 @@
 TARGETS = T1183 T1112 T1122
 PY = python3
 
-.PHONY: setup usalign fetch msa filter qc af3-prep import evaluate msa-compare compare overlays results analysis all clean
+.PHONY: setup usalign fetch msa filter qc af3-prep import evaluate msa-compare compare overlays results web analysis all clean
 
 setup:
 	$(PY) -m venv .venv
@@ -47,8 +47,12 @@ overlays:
 results:
 	$(PY) scripts/write_results.py
 
+# interactive 3D results page -> docs/index.html (open in a browser)
+web:
+	$(PY) scripts/build_web_page.py
+
 # stages 5b-7: everything downstream of the AF3 zips
-analysis: import evaluate msa-compare compare overlays results
+analysis: import evaluate msa-compare compare overlays results web
 
 # stages 1-4: fully automatic, no AF3 outputs needed yet
 all: fetch usalign msa filter qc af3-prep

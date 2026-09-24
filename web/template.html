@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Custom MSA vs AF3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+html, body { margin: 0; }
+img { max-width: 100%; }
+:root {
+  --ground: #f4f6f8;
+  --surface: #fcfdfd;
+  --ink: #14171c;
+  --ink-2: #4c5361;
+  --ink-3: #7b8290;
+  --line: #dde1e7;
+  --line-soft: #e9ecf0;
+  --custom: #2a78d6;
+  --default: #eb6834;
+  --ref: #9aa0aa;
+  --custom-wash: rgba(42,120,214,.10);
+  --default-wash: rgba(235,104,52,.10);
+  --outside: rgba(123,130,144,.10);
+  --font: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #101318; --surface: #171b21; --ink: #eceef2; --ink-2: #b3b9c4; --ink-3: #858c99;
+    --line: #2b313a; --line-soft: #222730; --custom: #3987e5; --default: #d95926; --ref: #7d838e;
+    --custom-wash: rgba(57,135,229,.16); --default-wash: rgba(217,89,38,.16); --outside: rgba(133,140,153,.12);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #101318; --surface: #171b21; --ink: #eceef2; --ink-2: #b3b9c4; --ink-3: #858c99;
+  --line: #2b313a; --line-soft: #222730; --custom: #3987e5; --default: #d95926; --ref: #7d838e;
+  --custom-wash: rgba(57,135,229,.16); --default-wash: rgba(217,89,38,.16); --outside: rgba(133,140,153,.12);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 40px); padding-block: 40px 64px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -.01em; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 4.6vw, 46px); max-width: 22ch; }
+h2 { font-size: 24px; }
+h3 { font-size: 17px; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.key { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.key i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.key i.c { background: var(--custom); } .key i.d { background: var(--default); } .key i.r { background: var(--ref); }
+
+/* header */
+header { display: grid; gap: 18px; }
+.answer { font-size: 18px; color: var(--ink-2); max-width: 62ch; }
+.answer strong { color: var(--ink); font-weight: 600; }
+
+/* headline dumbbell */
+.headline { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; margin-bottom: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+svg text { font-family: var(--mono); font-size: 11px; fill: var(--ink-3); }
+svg .lab { font-family: var(--font); font-size: 13px; fill: var(--ink); font-weight: 500; }
+svg .sub { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-3); }
+svg .val { fill: var(--ink-2); font-size: 11px; }
+.grid line { stroke: var(--line-soft); stroke-width: 1; }
+.axis line, .axis path { stroke: var(--line); }
+.findings { display: grid; gap: 14px; }
+.finding { display: grid; grid-template-columns: 3px 1fr; gap: 12px; }
+.finding::before { content: ""; background: var(--line); border-radius: 2px; }
+.finding p { font-size: 14.5px; color: var(--ink-2); }
+.finding p strong { color: var(--ink); font-weight: 600; }
+
+/* target switcher */
+.explore-head { display: flex; flex-wrap: wrap; gap: 14px 24px; justify-content: space-between; align-items: end; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: 14px; border: 0; background: transparent; color: var(--ink-2); padding: 7px 14px; border-radius: 6px; cursor: pointer; display: grid; text-align: left; line-height: 1.25; }
+.seg button small { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: .02em; }
+.seg button[aria-pressed="true"] { background: var(--ground); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.seg button:focus-visible, .toggles button:focus-visible, .toggles label:focus-within { outline: 2px solid var(--custom); outline-offset: 2px; }
+
+.explore { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; }
+.viewer-box { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; min-height: 420px; display: grid; grid-template-rows: auto 1fr; }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+.toggles label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.toggles input { accent-color: var(--ink-2); margin: 0; }
+.toggles .sep { flex: 1; }
+.mode { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.mode button { font: inherit; font-size: 12.5px; border: 0; background: transparent; color: var(--ink-2); padding: 4px 10px; cursor: pointer; }
+.mode button[aria-pressed="true"] { background: var(--ground); color: var(--ink); }
+#viewer { position: relative; width: 100%; height: 100%; min-height: 380px; }
+.viewer-note { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: var(--ink-3); pointer-events: none; }
+.plddt-key { position: absolute; right: 12px; bottom: 10px; display: flex; gap: 10px; font-size: 11.5px; color: var(--ink-2); background: var(--surface); padding: 4px 8px; border-radius: 6px; }
+.plddt-key i { width: 9px; height: 9px; display: inline-block; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+.metrics { display: grid; gap: 16px; align-content: start; }
+.verdict { font-family: var(--display); font-size: 20px; font-weight: 600; line-height: 1.25; }
+.verdict-sub { font-size: 14px; color: var(--ink-2); margin-top: 6px; }
+table.m { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.m th, table.m td { padding: 7px 0; border-bottom: 1px solid var(--line-soft); text-align: right; }
+table.m th:first-child, table.m td:first-child { text-align: left; color: var(--ink-2); font-weight: 400; }
+table.m thead th { font-size: 12px; color: var(--ink-3); font-weight: 500; border-bottom-color: var(--line); }
+table.m td.better { color: var(--ink); font-weight: 600; }
+table.m td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+table.m td:first-child { font-family: var(--font); }
+.note { font-size: 13px; color: var(--ink-2); }
+.note code { font-family: var(--mono); font-size: 12px; }
+
+.tracks { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 16px 8px; position: relative; }
+#tracks svg { display: block; width: 100%; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--ground); border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.45; font-family: var(--mono); white-space: nowrap; z-index: 5; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.tip b { font-family: var(--font); font-weight: 600; }
+.tip .sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px 36px; }
+.cols section { display: grid; gap: 8px; align-content: start; }
+.cols p, .cols li { font-size: 14px; color: var(--ink-2); }
+.cols ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+footer { font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 16px; }
+.table-scroll { overflow-x: auto; }
+
+@media (max-width: 860px) {
+  .headline, .explore { grid-template-columns: minmax(0, 1fr); }
+  .viewer-box { min-height: 360px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">CMP_SC 8170 · Project 1 · 3 CASP15 targets × 2 MSA conditions · AlphaFold 3 Server</span>
+    <h1>Does a hand-built MSA beat AlphaFold 3's own alignment?</h1>
+    <p class="answer"><strong>Not on these three targets.</strong> AF3's default MSA matched our custom ColabFold/MMseqs2 MSA on the easy target and beat it on the other two. The hard target, where a custom MSA was supposed to help most, had no homologs to find in either pipeline.</p>
+  </header>
+
+  <div class="headline">
+    <div class="panel">
+      <div class="chart-head">
+        <h3>TM-score vs. experimental structure</h3>
+        <div class="legend"><span class="key"><i class="c"></i>Custom MSA</span><span class="key"><i class="d"></i>AF3 default MSA</span></div>
+      </div>
+      <div id="dumbbell" role="img" aria-label="TM-score per target for custom and default MSA"></div>
+      <p class="note" style="margin-top:6px">Large dot = top-ranked model; small dots = the other 4 AF3 samples. TM &gt; 0.5 means the fold is correct.</p>
+    </div>
+    <div class="findings" id="findings">
+      <div class="finding"><p><strong>Default MSA ≥ custom on all 3 targets.</strong> ΔTM (custom − default) = <span class="num">−0.003</span>, <span class="num">−0.038</span>, <span class="num">−0.087</span>. On T1112 and T1122, all 5 samples of one condition beat all 5 of the other.</p></div>
+      <div class="finding"><p><strong>AF3 simply found more.</strong> Its server MSA held <span class="num">8,032</span> vs <span class="num">581</span> sequences (T1183) and <span class="num">1,967</span> vs <span class="num">855</span> (T1112). Our ≥ 50% coverage filter also dropped fragments AF3 keeps.</p></div>
+      <div class="finding"><p><strong>The orphan target had nothing to find.</strong> For T1122 both MSAs are the query plus a self-hit (AF3's also has one 37-residue fragment): Neff/L &lt; 0.01 either way.</p></div>
+      <div class="finding"><p><strong>Confidence picked the wrong one.</strong> The custom models had the <em>higher</em> pLDDT and pTM on T1183 and T1112 while being less accurate.</p></div>
+    </div>
+  </div>
+
+  <section style="display:grid;gap:16px">
+    <div class="explore-head">
+      <div style="display:grid;gap:6px">
+        <span class="eyebrow">Explore a target</span>
+        <h2 id="t-title">T1112</h2>
+      </div>
+      <div class="seg" role="group" aria-label="Target" id="seg"></div>
+    </div>
+
+    <div class="explore">
+      <div class="viewer-box">
+        <div class="toggles">
+          <label><input type="checkbox" id="show-ref" checked><span class="key"><i class="r"></i>Experiment</span></label>
+          <label><input type="checkbox" id="show-custom" checked><span class="key"><i class="c"></i>Custom</span></label>
+          <label><input type="checkbox" id="show-default" checked><span class="key"><i class="d"></i>AF3 default</span></label>
+          <span class="sep"></span>
+          <div class="mode" role="group" aria-label="Colour models by">
+            <button type="button" id="mode-cond" aria-pressed="true">By condition</button>
+            <button type="button" id="mode-plddt" aria-pressed="false">By pLDDT</button>
+          </div>
+        </div>
+        <div id="viewer" aria-label="3D overlay of experimental structure and both AF3 models"></div>
+        <div class="viewer-note" id="viewer-note">Drag to rotate · scroll to zoom</div>
+        <div class="plddt-key" id="plddt-key" hidden>
+          <span><i style="background:#0053d6"></i>&gt;90</span><span><i style="background:#65cbf3"></i>70–90</span><span><i style="background:#ffdb13"></i>50–70</span><span><i style="background:#ff7d45"></i>&lt;50</span>
+        </div>
+      </div>
+
+      <div class="metrics panel">
+        <div>
+          <div class="verdict" id="verdict"></div>
+          <p class="verdict-sub" id="verdict-sub"></p>
+        </div>
+        <div class="table-scroll">
+          <table class="m" id="mtable"></table>
+        </div>
+        <p class="note" id="t-note"></p>
+      </div>
+    </div>
+
+    <div class="tracks">
+      <div class="chart-head">
+        <h3>Along the chain</h3>
+        <div class="legend"><span class="key"><i class="c"></i>Custom MSA</span><span class="key"><i class="d"></i>AF3 default MSA</span><span class="note">Hover a residue to find it in 3D</span></div>
+      </div>
+      <div id="tracks"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <section>
+      <h3>How it was measured</h3>
+      <ul>
+        <li>Custom MSA: ColabFold MMseqs2 server (UniRef + environmental DB), filtered to ≥ 50% coverage, ≥ 20% identity, &lt; 90% redundancy, then uploaded to AF3 Server.</li>
+        <li>Default: same sequence, AF3 builds its own MSA. Templates on in both; 5 samples per job.</li>
+        <li>Scored on the CASP15 evaluation unit with US-align (residue-index TM-score, Cα RMSD) and Cα-lDDT (15 Å, 0.5/1/2/4 Å).</li>
+      </ul>
+    </section>
+    <section>
+      <h3>What limits the conclusion</h3>
+      <ul>
+        <li>Three targets: a case study, not a statistical test.</li>
+        <li>Each job used its own random seed, and AF3 retrieved different templates for T1112 and T1122, so the custom condition changes more than the MSA.</li>
+        <li>On the server a custom MSA replaces AF3's MSA; a union of both was not tested.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Next experiments</h3>
+      <ul>
+        <li>Rerun both conditions with templates off to isolate the MSA.</li>
+        <li>Relax the coverage filter for T1112 and check whether the C-terminal region (residues 340–425) recovers.</li>
+        <li>Add a "custom ∪ default" MSA condition.</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>Code, data and full write-up: <a href="https://github.com/weisi2580/8170-project1" style="color:inherit">github.com/weisi2580/8170-project1</a> (see RESULTS.md). Structures: 8IFX chain B (T1183), 8ORK (T1112), 8BBT chain A (T1122). Models from the AlphaFold Server, run 2026-09-23. In the 3D view, models are superposed on the experiment with US-align's TM-score rotation over the evaluation unit.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.4.2/3Dmol-min.js"></script>
+<script>
+const DATA = __DATA__;
+const TARGETS = ["T1183", "T1112", "T1122"];
+const INFO = {
+  T1183: { pdb: "8IFX · chain B", cls: "TBM-easy", name: "TsaB, Aquifex aeolicus",
+    note: "Easy target, deep MSA either way. Both models are within 1 Å of the experiment and used identical templates; AF3's MSA is 5× deeper (Neff/L 13.8 vs 2.6) but accuracy is already saturated." },
+  T1112: { pdb: "8ORK", cls: "FM/TBM", name: "Methanothermus fervidus protein",
+    note: "Our filtered MSA has the higher Neff/L (1.21 vs 0.90) but about 1.7× fewer sequences covering each column. The custom model loses accuracy mainly in residues ≈ 340–425, yet reports higher pLDDT there." },
+  T1122: { pdb: "8BBT · chain A", cls: "FM", name: "Tipula oleracea nudivirus protein",
+    note: "No homologs in either MSA. Both models place three helical segments (≈ 60–82, 118–135, 192–225) within 3 Å and misplace the rest. The gap between conditions comes from templates and seed, not MSA content." },
+};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 3) => v == null ? "–" : Number(v).toFixed(d);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+/* ---------- headline dumbbell ---------- */
+function drawDumbbell() {
+  const host = $("dumbbell"); host.innerHTML = "";
+  const W = Math.max(300, host.clientWidth), rowH = 58, top = 12, left = 96, right = 78, H = top + rowH * 3 + 30;
+  const x = v => left + (v - 0.3) / 0.7 * (W - left - right);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H }, host);
+  const g = el("g", { class: "grid" }, svg);
+  [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0].forEach(v => {
+    el("line", { x1: x(v), x2: x(v), y1: top - 4, y2: top + rowH * 3 }, g);
+    const t = el("text", { x: x(v), y: H - 8, "text-anchor": "middle" }, svg); t.textContent = v.toFixed(1);
+  });
+  el("line", { x1: x(0.5), x2: x(0.5), y1: top - 4, y2: top + rowH * 3, stroke: css("--ink-3"), "stroke-dasharray": "0", "stroke-width": 1, opacity: .5 }, svg);
+  TARGETS.forEach((t, i) => {
+    const r = DATA[t].row, cy = top + rowH * i + rowH / 2;
+    const lab = el("text", { x: 0, y: cy - 3, class: "lab" }, svg); lab.textContent = t;
+    const sub = el("text", { x: 0, y: cy + 13, class: "sub" }, svg); sub.textContent = INFO[t].cls;
+    const c = r.tm_score_custom, d = r.tm_score_default;
+    el("line", { x1: x(c), x2: x(d), y1: cy, y2: cy, stroke: css("--line"), "stroke-width": 3, "stroke-linecap": "round" }, svg);
+    ["custom", "default"].forEach((cond, j) => {
+      const col = css(cond === "custom" ? "--custom" : "--default");
+      DATA[t][cond + "_tm5"].forEach(v => el("circle", { cx: x(v), cy: cy + (j ? 9 : -9), r: 2.6, fill: col, opacity: .55 }, svg));
+      const v = cond === "custom" ? c : d;
+      const dot = el("circle", { cx: x(v), cy, r: 7, fill: col, stroke: css("--surface"), "stroke-width": 2 }, svg);
+      const tt = el("title", {}, dot); tt.textContent = `${t} ${cond === "custom" ? "custom MSA" : "AF3 default"}: TM ${v.toFixed(3)}`;
+    });
+    const dv = el("text", { x: W - 2, y: cy + 4, class: "val", "text-anchor": "end" }, svg);
+    dv.textContent = `Δ ${(c - d >= 0 ? "+" : "−")}${Math.abs(c - d).toFixed(3)}`;
+  });
+}
+
+/* ---------- target state ---------- */
+let current = store("msa-target") || "T1112";
+if (!TARGETS.includes(current)) current = "T1112";
+let colorMode = "cond";
+let viewer = null, models = {}, hoverRes = null;
+
+function buildSeg() {
+  const seg = $("seg");
+  TARGETS.forEach(t => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.t = t;
+    b.innerHTML = `${t}<small>${INFO[t].cls}</small>`;
+    b.addEventListener("click", () => select(t));
+    seg.appendChild(b);
+  });
+}
+
+function renderMetrics(t) {
+  const r = DATA[t].row, d = r.delta_tm_custom_minus_default;
+  $("t-title").textContent = `${t} · ${INFO[t].name}`;
+  const same = Math.abs(d) < 0.01;
+  $("verdict").textContent = same ? "No meaningful difference" : "AF3 default MSA wins";
+  $("verdict-sub").innerHTML = `PDB ${INFO[t].pdb} · CASP15 ${INFO[t].cls} · evaluation unit ${r.eval_unit} · ΔTM <span class="num">${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(3)}</span>`;
+  const rows = [
+    ["TM-score", r.tm_score_custom, r.tm_score_default, 3, "hi"],
+    ["TM-score, 5-sample mean", r.tm_score_mean5_custom, r.tm_score_mean5_default, 3, "hi"],
+    ["Cα-lDDT", r.lddt_custom, r.lddt_default, 3, "hi"],
+    ["Cα RMSD (Å)", r.rmsd_custom, r.rmsd_default, 2, "lo"],
+    ["Mean pLDDT", r.mean_plddt_custom, r.mean_plddt_default, 1, "conf"],
+    ["MSA sequences", r.msa_depth_custom, r.msa_depth_default, 0, "none"],
+    ["MSA Neff / L", r.neff_per_l_custom, r.neff_per_l_default, 3, "none"],
+  ];
+  let h = `<thead><tr><th></th><th><span class="key"><i class="c"></i>Custom</span></th><th><span class="key"><i class="d"></i>AF3 default</span></th></tr></thead><tbody>`;
+  rows.forEach(([name, c, dv, dp, sense]) => {
+    let bc = "", bd = "";
+    if (sense === "hi" && Math.abs(c - dv) > 1e-9) { c > dv ? bc = "better" : bd = "better"; }
+    if (sense === "lo" && Math.abs(c - dv) > 1e-9) { c < dv ? bc = "better" : bd = "better"; }
+    const f = v => dp === 0 ? Number(v).toLocaleString() : fmt(v, dp);
+    h += `<tr><td>${name}</td><td class="${bc}">${f(c)}</td><td class="${bd}">${f(dv)}</td></tr>`;
+  });
+  const tp = DATA[t].templates;
+  h += `<tr><td>Templates used</td><td>${tp.custom.join(" ")}</td><td>${tp.default.join(" ")}</td></tr></tbody>`;
+  $("mtable").innerHTML = h;
+  $("t-note").textContent = INFO[t].note;
+}
+
+/* ---------- 3D viewer ---------- */
+function plddtColor(b) { return b > 90 ? "#0053d6" : b > 70 ? "#65cbf3" : b > 50 ? "#ffdb13" : "#ff7d45"; }
+function initViewer() {
+  if (!window.$3Dmol) { $("viewer-note").textContent = "3D viewer could not load (3Dmol.js blocked)."; return; }
+  viewer = $3Dmol.createViewer($("viewer"), { backgroundColor: css("--surface"), antialias: true });
+}
+function loadStructures(t) {
+  if (!viewer) return;
+  viewer.removeAllModels(); viewer.removeAllShapes(); models = {};
+  models.ref = viewer.addModel(DATA[t].ref, "pdb");
+  models.custom = viewer.addModel(DATA[t].custom, "pdb");
+  models.default = viewer.addModel(DATA[t].default, "pdb");
+  applyStyles();
+  viewer.zoomTo({ model: models.ref }); viewer.zoom(0.95);
+  viewer.render();
+}
+function applyStyles() {
+  if (!viewer) return;
+  const show = { ref: $("show-ref").checked, custom: $("show-custom").checked, default: $("show-default").checked };
+  const cols = { ref: css("--ref"), custom: css("--custom"), default: css("--default") };
+  for (const k of ["ref", "custom", "default"]) {
+    const m = models[k]; if (!m) continue;
+    if (!show[k]) { m.setStyle({}, {}); continue; }
+    if (k === "ref") m.setStyle({}, { cartoon: { color: cols.ref, opacity: 0.6, thickness: 0.3 } });
+    else if (colorMode === "plddt") m.setStyle({}, { cartoon: { colorfunc: a => plddtColor(a.b) } });
+    else m.setStyle({}, { cartoon: { color: cols[k] } });
+  }
+  viewer.removeAllShapes();
+  if (hoverRes != null) {
+    for (const k of ["ref", "custom", "default"]) {
+      if (!show[k] || !models[k]) continue;
+      const a = models[k].selectedAtoms({ resi: hoverRes, atom: "CA" })[0];
+      if (a) viewer.addSphere({ center: { x: a.x, y: a.y, z: a.z }, radius: 1.3, color: k === "ref" ? css("--ink") : cols[k], opacity: 0.95 });
+    }
+  }
+  viewer.render();
+}
+["show-ref", "show-custom", "show-default"].forEach(id => $(id).addEventListener("change", applyStyles));
+function setMode(m) {
+  colorMode = m;
+  $("mode-cond").setAttribute("aria-pressed", m === "cond");
+  $("mode-plddt").setAttribute("aria-pressed", m === "plddt");
+  $("plddt-key").hidden = m !== "plddt";
+  applyStyles();
+}
+$("mode-cond").addEventListener("click", () => setMode("cond"));
+$("mode-plddt").addEventListener("click", () => setMode("plddt"));
+
+/* ---------- per-residue tracks ---------- */
+function drawTracks(t) {
+  const host = $("tracks"); host.innerHTML = "";
+  const D = DATA[t], L = D.cov.custom.length;
+  const [lo, hi] = D.row.eval_unit.split("-").map(Number);
+  const W = Math.max(320, host.clientWidth), left = 58, right = 14;
+  const panels = [
+    { key: "cov", title: "MSA sequences covering residue", h: 70 },
+    { key: "plddt", title: "pLDDT (AF3 confidence)", h: 110 },
+    { key: "err", title: "Cα error vs. experiment (Å)", h: 110 },
+  ];
+  const gap = 26; let y = 14;
+  panels.forEach(p => { p.y = y; y += p.h + gap; });
+  const H = y - gap + 26;
+  const x = r => left + (r - 0.5) / L * (W - left - right);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H }, host);
+  const colC = css("--custom"), colD = css("--default");
+  const series = {
+    cov: { custom: D.cov.custom.map((v, i) => [i + 1, v]), default: D.cov.default.map((v, i) => [i + 1, v]) },
+    plddt: { custom: D.custom_res.resnum.map((r, i) => [r, D.custom_res.plddt[i]]), default: D.default_res.resnum.map((r, i) => [r, D.default_res.plddt[i]]) },
+    err: { custom: D.custom_res.resnum.map((r, i) => [r, D.custom_res.err[i]]), default: D.default_res.resnum.map((r, i) => [r, D.default_res.err[i]]) },
+  };
+  const maxCov = Math.max(...D.cov.custom, ...D.cov.default);
+  const logCov = maxCov > 20;
+  const errMax = Math.max(4, ...series.err.custom.map(p => p[1] || 0), ...series.err.default.map(p => p[1] || 0));
+  panels.forEach(p => {
+    let yv, ticks;
+    if (p.key === "cov") {
+      if (logCov) {
+        const top = Math.pow(10, Math.ceil(Math.log10(maxCov)));
+        yv = v => p.y + p.h - Math.log10(Math.max(v, 1)) / Math.log10(top) * p.h;
+        ticks = []; for (let e = 0; Math.pow(10, e) <= top; e++) ticks.push(Math.pow(10, e));
+      } else {
+        yv = v => p.y + p.h - v / Math.max(maxCov, 2) * p.h;
+        ticks = [0, 1, 2].filter(v => v <= Math.max(maxCov, 2));
+      }
+    } else if (p.key === "plddt") { yv = v => p.y + p.h - v / 100 * p.h; ticks = [0, 50, 70, 90]; }
+    else { const top = Math.ceil(errMax / 5) * 5; yv = v => p.y + p.h - Math.min(v, top) / top * p.h; ticks = [0, top / 2, top]; }
+    p.yv = yv;
+    // outside evaluation unit
+    [[0.5, lo - 0.5], [hi + 0.5, L + 0.5]].forEach(([a, b]) => { if (b > a) el("rect", { x: x(a), y: p.y, width: x(b) - x(a), height: p.h, fill: css("--outside") }, svg); });
+    const g = el("g", { class: "grid" }, svg);
+    ticks.forEach(v => {
+      el("line", { x1: left, x2: W - right, y1: yv(v), y2: yv(v) }, g);
+      const tx = el("text", { x: left - 6, y: yv(v) + 3.5, "text-anchor": "end" }, svg);
+      tx.textContent = v >= 1000 ? (v / 1000) + "k" : v;
+    });
+    const ttl = el("text", { x: left, y: p.y - 5, class: "sub", style: `fill:${css("--ink-2")}` }, svg); ttl.textContent = p.title;
+    ["default", "custom"].forEach(cond => {
+      let dstr = "", pen = false;
+      series[p.key][cond].forEach(([r, v]) => {
+        if (v == null) { pen = false; return; }
+        dstr += (pen ? "L" : "M") + x(r).toFixed(1) + "," + yv(v).toFixed(1); pen = true;
+      });
+      el("path", { d: dstr, fill: "none", stroke: cond === "custom" ? colC : colD, "stroke-width": 1.8, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+    });
+  });
+  // x axis
+  const step = L > 300 ? 50 : 25;
+  for (let r = step; r <= L; r += step) { const tx = el("text", { x: x(r), y: H - 6, "text-anchor": "middle" }, svg); tx.textContent = r; }
+  const cross = el("line", { y1: 8, y2: H - 20, stroke: css("--ink-3"), "stroke-width": 1, visibility: "hidden" }, svg);
+  const hit = el("rect", { x: left, y: 0, width: W - left - right, height: H - 18, fill: "transparent", style: "cursor:crosshair" }, svg);
+  const tip = $("tip");
+  const byRes = (arr, r) => { const i = arr.resnum.indexOf(r); return i < 0 ? null : i; };
+  function move(ev) {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    const r = Math.min(L, Math.max(1, Math.round((px - left) / (W - left - right) * L + 0.5)));
+    cross.setAttribute("x1", x(r)); cross.setAttribute("x2", x(r)); cross.setAttribute("visibility", "visible");
+    const ic = byRes(D.custom_res, r), id = byRes(D.default_res, r);
+    const ec = ic == null ? null : D.custom_res.err[ic], ed = id == null ? null : D.default_res.err[id];
+    const inUnit = r >= lo && r <= hi && ec != null;
+    tip.innerHTML = `<b>Residue ${r} · ${D.aa[r - 1] || ""}</b>${inUnit ? "" : " <span style='opacity:.7'>(not scored)</span>"}<br>` +
+      `<span class="sw" style="background:${colC}"></span>custom &nbsp;pLDDT ${fmt(D.custom_res.plddt[ic], 0).padStart(3)} · err ${ec == null ? "  –" : ec.toFixed(1).padStart(4)} Å · MSA ${D.cov.custom[r - 1]}<br>` +
+      `<span class="sw" style="background:${colD}"></span>default pLDDT ${fmt(D.default_res.plddt[id], 0).padStart(3)} · err ${ed == null ? "  –" : ed.toFixed(1).padStart(4)} Å · MSA ${D.cov.default[r - 1]}`;
+    tip.hidden = false;
+    const box = host.parentElement.getBoundingClientRect();
+    let tx = ev.clientX - box.left + 14, ty = ev.clientY - box.top + 14;
+    if (tx + tip.offsetWidth > box.width - 8) tx = ev.clientX - box.left - tip.offsetWidth - 14;
+    tip.style.left = Math.max(4, tx) + "px"; tip.style.top = ty + "px";
+    if (hoverRes !== r) { hoverRes = r; applyStyles(); }
+  }
+  function leave() { cross.setAttribute("visibility", "hidden"); tip.hidden = true; hoverRes = null; applyStyles(); }
+  hit.addEventListener("pointermove", move);
+  hit.addEventListener("pointerleave", leave);
+}
+
+function select(t) {
+  current = t; store("msa-target", t); hoverRes = null;
+  document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.t === t));
+  renderMetrics(t); loadStructures(t); drawTracks(t);
+}
+
+buildSeg(); drawDumbbell(); initViewer(); select(current);
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { drawDumbbell(); drawTracks(current); viewer && viewer.resize(); }, 150); });
+const mq = window.matchMedia("(prefers-color-scheme: dark)");
+const retheme = () => { drawDumbbell(); drawTracks(current); if (viewer) { viewer.setBackgroundColor(css("--surface")); applyStyles(); } };
+mq.addEventListener && mq.addEventListener("change", retheme);
+new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>

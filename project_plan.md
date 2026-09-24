@@ -164,7 +164,7 @@ project1/
 
 **Manual step?**: No (overlay.pml needs PyMOL installed, which isn't set up on this machine yet — see env.yml).
 
-**Status**: **Completed.** `scripts/plot_comparison.py` writes `figures/metric_comparison.png`, `msa_depth_vs_accuracy.png`, `plddt_vs_lddt.png`, and per target `per_residue.png` (MSA coverage + pLDDT + Cα error; replaces the planned `plddt.png`) and `pae.png`. `scripts/render_overlays.py` (PyMOL pip wheel; replaces `overlay.pml`) writes `figures/<ID>/overlay.png` + `overlay_plddt.png`. `scripts/write_results.py` generates `RESULTS.md` with every number read from `eval/`. `make analysis` rebuilds all of it byte-identically from `af3_raw/`. **Result:** the custom MSA never beat AF3's default (ΔTM −0.003 / −0.038 / −0.087 for T1183 / T1112 / T1122), so the working hypothesis is not supported. See `RESULTS.md`.
+**Status**: **Completed.** `scripts/plot_comparison.py` writes `figures/metric_comparison.png`, `msa_depth_vs_accuracy.png`, `plddt_vs_lddt.png`, and per target `per_residue.png` (MSA coverage + pLDDT + Cα error; replaces the planned `plddt.png`) and `pae.png`. `scripts/render_overlays.py` (PyMOL pip wheel; replaces `overlay.pml`) writes `figures/<ID>/overlay.png` + `overlay_plddt.png`. `scripts/write_results.py` generates `RESULTS.md` with every number read from `eval/`. `make analysis` rebuilds all of it byte-identically from `af3_raw/`. Presentation extras: `scripts/build_web_page.py` → `docs/index.html` (interactive 3D overlay page, 3Dmol.js), and a 14-slide deck draft (Claude artifact, kept outside the repo). **Result:** the custom MSA never beat AF3's default (ΔTM −0.003 / −0.038 / −0.087 for T1183 / T1112 / T1122), so the working hypothesis is not supported. See `RESULTS.md`.
 
 ---
 
