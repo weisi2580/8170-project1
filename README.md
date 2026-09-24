@@ -14,7 +14,7 @@ For each target, AF3 is run twice — once seeded with a custom MSA built via th
 
 ## Headline result
 
-**AF3's own default MSA was as good as or better than our custom MSA on all 3 targets.** Full write-up: [`RESULTS.md`](RESULTS.md).
+**AF3's own default MSA was as good as or better than our custom MSA on all 3 targets.** Full write-up: [`RESULTS.md`](RESULTS.md). Every setting, every difference between the two conditions, and the diagnosis of *why* the custom MSA lost: [`METHODS.md`](METHODS.md).
 
 | Target | CASP class | TM-score custom | TM-score default | ΔTM (custom − default) |
 |---|---|---|---|---|
@@ -100,6 +100,7 @@ The pipeline mirrors `project_plan.md`'s steps 1–8. Everything except the AF3 
 | 5b. Import AF3 downloads | `python scripts/import_af3_results.py` | Unpacks `af3_raw/*.zip`, checks the job sequence == FASTA and the uploaded MSA == `msa/<ID>/<ID>_custom.a3m` byte-for-byte, copies the top-ranked sample up, writes `job_metadata.json` (seed, templates, ranking score) |
 | 6. Evaluate structures | `python scripts/evaluate_structures.py` | All 5 samples per run: TM-score/RMSD (US-align, residue-index superposition, CASP evaluation unit), Cα-lDDT, pLDDT, PAE, pTM |
 | 6b. Compare MSAs | `python scripts/compare_msas.py` | Our custom MSA vs. the MSA the AF3 server built: depth, Neff/L, per-column coverage |
+| 6c. Template check | `python scripts/analyze_templates.py` | Scores every template AF3 used (both conditions) against the experiment: coverage, identity, TM → `eval/template_analysis.csv` |
 | 7. Comparison figures + table | `python scripts/plot_comparison.py` | `figures/metric_comparison.png`, `msa_depth_vs_accuracy.png`, `plddt_vs_lddt.png`, per-target `per_residue.png` + `pae.png`, `eval/target_summary_table.csv` |
 | 7b. 3D overlay figures | `python scripts/render_overlays.py` | PyMOL (pip wheel `pymol-open-source-whl`, in requirements.txt): reference/custom/default overlay + pLDDT-coloured models |
 | 7c. Results write-up | `python scripts/write_results.py` | Generates `RESULTS.md`; every number is read from `eval/` |
@@ -110,7 +111,7 @@ Or via `make`:
 make setup usalign
 make all           # stages 1, 3, 3b, 4, and AF3 input prep
 # ... manual AF3 step (see below) ...
-make analysis      # import, evaluate, msa-compare, compare, overlays, results, web
+make analysis      # import, evaluate, msa-compare, templates, compare, overlays, results, web
 ```
 
 ### Step 5 is manual

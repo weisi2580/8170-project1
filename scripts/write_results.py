@@ -128,9 +128,13 @@ TARGET_NOTES = {
         "MSA keeps partial-coverage fragments too, so roughly 1.7× more sequences cover each column. "
         "The default model has equal or better lDDT at ~76% of residues, and the gap is concentrated in "
         "the C-terminal region (≈ residues 340–425), where the custom model's Cα error reaches ~12 Å "
-        "(88% vs 76% of residues within 3 Å overall). The two runs also got "
-        "different template sets. Notably, the custom model has the *higher* mean pLDDT "
-        "({r.mean_plddt_custom:.1f} vs {r.mean_plddt_default:.1f}) while being less accurate."
+        "(88% vs 76% of residues within 3 Å overall). That region is folded correctly *locally* in both "
+        "models; the custom model places it at the wrong angle relative to the core (6.2 vs 4.3 Å after "
+        "superposing residues 1–339). Domain orientation depends on co-evolution from full-length "
+        "homologs, which the coverage filter thinned out. Templates cover only ~35% of the chain in "
+        "either run and the models do not follow them (see METHODS.md §4). Notably, the custom model "
+        "has the *higher* mean pLDDT ({r.mean_plddt_custom:.1f} vs {r.mean_plddt_default:.1f}) while "
+        "being less accurate."
     ),
     "T1122": (
         "The hard, FM target, and the one the working hypothesis expected a custom MSA to help. In "
@@ -141,7 +145,9 @@ TARGET_NOTES = {
         "(≈ residues 60–82, 118–135 and 192–225) and misplace the rest; 40% vs 32% of residues are "
         "within 3 Å for default vs custom. The default run is modestly but consistently better (no overlap across the 5 samples). "
         "Since the MSAs carry no evolutionary information in either condition, this gap cannot come from "
-        "MSA *content*. It more plausibly comes from the different template sets and the different random seed."
+        "MSA *content*. The templates do not explain it either: all are poor (TM ≤ 0.11 against the "
+        "experiment) and neither model follows them. The most likely explanation is run-to-run (seed) "
+        "variation, which one job per condition cannot measure (METHODS.md §4)."
     ),
 }
 
@@ -156,8 +162,10 @@ OVERALL = (
     "headers show UniRef90, MGnify and UniProt hits) on both deep targets, and found nothing more on "
     "the orphan target. Our filter "
     "also dropped partial-coverage hits that AF3 keeps, which is the likely cause of the T1112 C-terminal "
-    "regression. Uploading a custom MSA also changes which templates AF3 retrieves, so the custom-MSA "
-    "condition changes more than the MSA."
+    "regression: our raw search had more T1112 sequences than AF3 (2,547 vs 1,967) before the filter "
+    "removed 58% of them, and the custom model loses the C-terminal domain orientation. Uploading a custom "
+    "MSA also changes which templates AF3 retrieves, but a template-by-template check shows templates "
+    "do not explain the gap on any target. Settings and evidence: METHODS.md."
 )
 
 CALIBRATION = (
@@ -174,7 +182,7 @@ CALIBRATION = (
 LIMITATIONS = "\n".join([
     "- **n = 3 targets.** This is a case study, not a statistical test; the per-target sample spread is reported so single-sample noise is not over-read.",
     "- **One seed per condition.** The AF3 server chose a different random seed for each job (see `af3_*/*/job_metadata.json`). The 5 diffusion samples within a job share that seed's trunk, so the ± sd understates seed-to-seed variance.",
-    "- **Templates were on in both conditions** and were re-searched per job, so they differ for T1112 and T1122. A templates-off rerun would isolate the MSA effect.",
+    "- **Templates were on in both conditions** and were re-searched per job, so they differ for T1112 and T1122. `scripts/analyze_templates.py` finds they don't explain the gap (weak, and not followed by the models), but a templates-off rerun would remove the question entirely.",
     "- **Custom MSA replaces, not augments,** AF3's MSA on the server. A 'union of both MSAs' condition was not tested.",
     "- **Cα-lDDT**, not the all-atom lDDT CASP reports; TM-score/RMSD are also Cα-based. Rankings between conditions agree across all three metrics here.",
     "- The AF3 server's exact submission time and model build are not in its download; `submitted_at` is left null and `finished_at` is taken from the zip timestamps.",

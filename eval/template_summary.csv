@@ -1,0 +1,7 @@
+casp_id,condition,templates,union_coverage,best_template_tm_ref
+T1183,custom,3zet 4wq4 3r6m 1okj,0.995,0.641
+T1183,default,3r6m 3zet 4wq4 1okj,0.995,0.691
+T1112,custom,2hf8 2wsm 1vl8 1vl8,0.341,0.161
+T1112,default,2hf8 2wsm 4lps 3dm5,0.354,0.163
+T1122,custom,2pyb 3f9i 3f9i 4ayd,0.765,0.114
+T1122,default,2pyb 4oyu 3f9i 3f9i,0.796,0.114

@@ -179,4 +179,4 @@ project1/
 ## Suggested run order
 
 1 ✅, 2 ✅, 3 ✅, 4 ✅ — all completed in one Claude Code session, with real data (see per-step Status notes above).
-5 ✅ (manual AF3 submissions, 2026-09-23), 6 ✅, 7 ✅, 8 ✅ — all done. Remaining optional follow-ups for the report: a templates-off rerun of both conditions (isolates the MSA effect), and a "custom ∪ default MSA" condition.
+5 ✅ (manual AF3 submissions, 2026-09-23), 6 ✅, 7 ✅, 8 ✅ — all done. Diagnosis added 2026-09-24 (`scripts/analyze_templates.py`, `METHODS.md`): templates were on in both conditions and do not explain the gap. T1112's loss is C-terminal domain orientation (6.2 vs 4.3 Å after core superposition), consistent with the ≥ 50% coverage filter removing 58% of hits. T1122's gap is most likely seed variation. Proposed decisive reruns: unfiltered custom MSA (`msa/T1112/T1112_raw.a3m`), templates off, extra seeds. Remaining optional follow-ups for the report: a templates-off rerun of both conditions (isolates the MSA effect), and a "custom ∪ default MSA" condition.
